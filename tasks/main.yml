@@ -41,6 +41,11 @@
     dest: "/usr/local/bin/squeezeplay"
     state: link
   tags: squeezeplay
+- name: Create launcher directory
+  file:
+    path: /usr/local/share/applications
+    state: directory
+    mode: 0755
 - name: Copy Squeezeplay desktop launcher
   copy:
     src: squeezeplay.desktop
