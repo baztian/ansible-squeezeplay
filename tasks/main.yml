@@ -12,8 +12,9 @@
 - name: Download squeezeplay {{ squeezeplay_version }}
   get_url:
     url: "https://sourceforge.net/projects/lmsclients/files/squeezeplay/linux/squeezeplay-pulse-{{ squeezeplay_version }}-x86_64.tgz"
-    checksum: "sha256:{{ squeezeplay_sha256 }}"
+    checksum: "sha1:{{ squeezeplay_sha1 }}"
     dest: "/tmp/squeezeplay-{{ squeezeplay_version }}.zip"
+    mode: 0644
   tags: squeezeplay
   when: not squeezeplay_directory.stat.exists
 - name: Create squeezeplay {{ squeezeplay_version }} directory
@@ -26,6 +27,7 @@
   unarchive:
     src: "/tmp/squeezeplay-{{ squeezeplay_version }}.zip"
     dest: "/opt/squeezeplay-{{ squeezeplay_version }}"
+    mode: 0644
     remote_src: yes
   tags: squeezeplay
   when: not squeezeplay_directory.stat.exists

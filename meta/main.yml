@@ -3,16 +3,13 @@ galaxy_info:
   role_name: squeezeplay
   description: Role for installing squeezeplay
   license: MIT
-  min_ansible_version: 2.0
+  min_ansible_version: '2.0'
   platforms:
   - name: Ubuntu
     versions:
-    - xenial
-    - bionic
-    - focal
+    - noble
   - name: Debian
     versions:
-    - stretch
     - buster
   galaxy_tags:
     - packages
