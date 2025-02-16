@@ -33,6 +33,31 @@
     remote_src: yes
   tags: squeezeplay
   when: not squeezeplay_directory.stat.exists
+- name: Change ownership to root and set file permissions
+  file:
+    path: /opt/squeezeplay-{{ squeezeplay_version }}
+    owner: root
+    group: root
+    recurse: yes
+  tags: squeezeplay
+- name: Ensure directories have execute permissions
+  find:
+    paths: /opt/squeezeplay-{{ squeezeplay_version }}
+    recurse: yes
+    file_type: directory
+  register: directories
+  tags: squeezeplay
+- name: Set execute permissions on directories
+  file:
+    path: "{{ item.path }}"
+    mode: 'a+x'
+  with_items: "{{ directories.files }}"
+  tags: squeezeplay
+- name: Make all files in bin directory executable
+  file:
+    path: /opt/squeezeplay-{{ squeezeplay_version }}/bin
+    mode: 'a+x'
+    recurse: no
 - name: Symlink default squeezeplay to {{ squeezeplay_version }}
   file:
     src: "squeezeplay-{{ squeezeplay_version }}"
