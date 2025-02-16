@@ -1,10 +1,12 @@
 ---
 - name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=3600
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
 - name: Install prerequesits for squeezeplay-pulse
   apt:
     pkg: libpulse0
-- name: Check if squeezeplay {{ squeezeplay_version }} already installed
+- name: Check if squeezeplay version already installed
   stat:
     path: /opt/squeezeplay-{{ squeezeplay_version }}
   register: squeezeplay_directory
@@ -17,7 +19,7 @@
     mode: 0644
   tags: squeezeplay
   when: not squeezeplay_directory.stat.exists
-- name: Create squeezeplay {{ squeezeplay_version }} directory
+- name: Create squeezeplay directory
   file:
     path: "/opt/squeezeplay-{{ squeezeplay_version }}"
     state: directory
