@@ -1,10 +1,12 @@
 ---
 - name: Update apt cache.
-  apt: update_cache=yes cache_valid_time=3600
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
 - name: Install prerequesits for squeezeplay-pulse
   apt:
     pkg: libpulse0
-- name: Check if squeezeplay {{ squeezeplay_version }} already installed
+- name: Check if squeezeplay version already installed
   stat:
     path: /opt/squeezeplay-{{ squeezeplay_version }}
   register: squeezeplay_directory
@@ -12,11 +14,12 @@
 - name: Download squeezeplay {{ squeezeplay_version }}
   get_url:
     url: "https://sourceforge.net/projects/lmsclients/files/squeezeplay/linux/squeezeplay-pulse-{{ squeezeplay_version }}-x86_64.tgz"
-    checksum: "sha256:{{ squeezeplay_sha256 }}"
+    checksum: "sha1:{{ squeezeplay_sha1 }}"
     dest: "/tmp/squeezeplay-{{ squeezeplay_version }}.zip"
+    mode: 0644
   tags: squeezeplay
   when: not squeezeplay_directory.stat.exists
-- name: Create squeezeplay {{ squeezeplay_version }} directory
+- name: Create squeezeplay directory
   file:
     path: "/opt/squeezeplay-{{ squeezeplay_version }}"
     state: directory
@@ -26,9 +29,35 @@
   unarchive:
     src: "/tmp/squeezeplay-{{ squeezeplay_version }}.zip"
     dest: "/opt/squeezeplay-{{ squeezeplay_version }}"
+    mode: 0644
     remote_src: yes
   tags: squeezeplay
   when: not squeezeplay_directory.stat.exists
+- name: Change ownership to root and set file permissions
+  file:
+    path: /opt/squeezeplay-{{ squeezeplay_version }}
+    owner: root
+    group: root
+    recurse: yes
+  tags: squeezeplay
+- name: Ensure directories have execute permissions
+  find:
+    paths: /opt/squeezeplay-{{ squeezeplay_version }}
+    recurse: yes
+    file_type: directory
+  register: directories
+  tags: squeezeplay
+- name: Set execute permissions on directories
+  file:
+    path: "{{ item.path }}"
+    mode: 'a+x'
+  with_items: "{{ directories.files }}"
+  tags: squeezeplay
+- name: Make all files in bin directory executable
+  file:
+    path: /opt/squeezeplay-{{ squeezeplay_version }}/bin
+    mode: 'a+x'
+    recurse: no
 - name: Symlink default squeezeplay to {{ squeezeplay_version }}
   file:
     src: "squeezeplay-{{ squeezeplay_version }}"
